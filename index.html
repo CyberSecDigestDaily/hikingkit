@@ -1,0 +1,772 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Hill &amp; Night Kit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: header with an OS-style contour sketch and the budget meter, then kit cards (left) beside a sticky colour check and order list (right). One column under 940px. */
+:root{
+  --bg:#edf0ee;          /* granite mist */
+  --surface:#f8faf9;
+  --ink:#1a2127;         /* slate */
+  --muted:#56626b;
+  --line:#d2d8d6;
+  --contour:#c6cfcb;
+  --chip:#e5e9e7;
+  --gorse:#c9971b;       /* accent fill */
+  --gorse-ink:#7a5a08;   /* accent text */
+  --ok:#2c7650;
+  --warn:#b0501c;
+  --swatch-edge:rgba(26,33,39,.24);
+  --font-display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --font-body:"IBM Plex Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161b; --surface:#172028; --ink:#e3e8ea; --muted:#97a3ab; --line:#2b363f;
+    --contour:#24303a; --chip:#1f2a33; --gorse:#dcae38; --gorse-ink:#e8c35c;
+    --ok:#6cc292; --warn:#ec8c56; --swatch-edge:rgba(227,232,234,.3); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161b; --surface:#172028; --ink:#e3e8ea; --muted:#97a3ab; --line:#2b363f;
+  --contour:#24303a; --chip:#1f2a33; --gorse:#dcae38; --gorse-ink:#e8c35c;
+  --ok:#6cc292; --warn:#ec8c56; --swatch-edge:rgba(227,232,234,.3); color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1180px;margin-inline:auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+h1,h2,h3,h4{text-wrap:balance}
+
+/* Header */
+.top{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+#contours{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.top-inner{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;align-items:end;padding-block:44px 32px}
+h1{font-family:var(--font-display);font-stretch:72%;font-weight:760;font-size:clamp(38px,6vw,60px);line-height:.98;letter-spacing:-.005em;margin:10px 0 14px}
+.lede{max-width:58ch;margin:0}
+.budget{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 18px 16px;display:grid;gap:8px}
+.total{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:36px;font-weight:500;line-height:1.1;margin:0}
+.meter{position:relative;height:30px}
+.meter .track{position:absolute;left:0;right:0;top:0;height:10px;border-radius:5px;background:var(--chip);overflow:hidden}
+.meter .fill{position:absolute;left:0;top:0;bottom:0;background:var(--gorse)}
+.meter .over{position:absolute;top:0;bottom:0;background:var(--warn)}
+.meter .mark{position:absolute;top:-4px;width:2px;height:18px;background:var(--ink);transform:translateX(-1px)}
+.meter .mark-label{position:absolute;top:15px;transform:translateX(-50%);font-family:var(--font-mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.status{margin:0;font-weight:600}
+.status.ok{color:var(--ok)}
+.status.over{color:var(--warn)}
+.sub-stats{margin:0;font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.btn{justify-self:start;font:500 13px/1 var(--font-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:6px;padding:8px 12px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+
+/* Main grid: flex column on phones (sections reordered), two columns on desktop */
+.grid{display:flex;flex-direction:column;gap:28px;padding-block:28px 12px}
+.grid > main,.grid > aside{display:contents}
+#changes{order:1} #check{order:2} #kit{order:3} #later{order:4} #orders-sec{order:5}
+@media (min-width:940px){
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;align-items:start}
+  .grid > main{display:flex;flex-direction:column;gap:36px;grid-column:1;grid-row:1;min-width:0}
+  .grid > aside{display:flex;flex-direction:column;gap:16px;grid-column:2;grid-row:1;position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px);max-height:calc(100vh - 32px);overflow:auto}
+}
+@media (max-width:939px){
+  .top-inner{grid-template-columns:minmax(0,1fr);gap:22px;padding-block:30px 24px}
+}
+section{min-width:0}
+.sec{font-family:var(--font-display);font-stretch:80%;font-weight:700;font-size:24px;line-height:1.15;margin:0 0 4px}
+.sec-sub{color:var(--muted);margin:0 0 16px;font-size:14px;max-width:65ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 16px 18px}
+.panel .sec{font-size:20px}
+
+/* What changed */
+.changes ul{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.changes li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:baseline}
+.tagc{font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--gorse-ink)}
+.changes p{margin:0;max-width:68ch}
+
+/* Kit cards */
+.group{display:grid;gap:12px}
+.group + .group{margin-top:26px}
+.grp{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.grp small{font-family:var(--font-body);font-size:13px;letter-spacing:0;text-transform:none}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.item.out{background:transparent;border-style:dashed}
+.item.out .amt{color:var(--muted)}
+.item-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.layer{font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.item h4{font-family:var(--font-display);font-stretch:85%;font-weight:680;font-size:20px;line-height:1.15;margin:0}
+.why{margin:0}
+.spec{margin:0;font-family:var(--font-mono);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:5px 10px 5px 6px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--ink);font:500 13px/1.2 var(--font-body);cursor:pointer}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--surface);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.sw{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px var(--swatch-edge);flex:none}
+.pick{font-family:var(--font-mono);font-size:10.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--gorse-ink)}
+.meta{margin:0;display:grid;gap:5px;font-size:13.5px}
+.meta div{display:grid;grid-template-columns:50px minmax(0,1fr);gap:8px}
+.meta dt{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.meta dd{margin:0}
+.buy{display:flex;align-items:baseline;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px;margin-top:auto}
+.amt{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:20px;font-weight:500}
+.store{color:var(--muted);font-size:13.5px}
+.go{font-weight:600;text-decoration:underline;text-decoration-color:var(--gorse);text-decoration-thickness:2px;text-underline-offset:3px}
+.go:hover{text-decoration-color:var(--ink)}
+.inkit{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+.inkit input{appearance:none;-webkit-appearance:none;width:30px;height:18px;border-radius:9px;background:var(--line);position:relative;cursor:pointer;margin:0;flex:none}
+.inkit input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface)}
+.inkit input:checked{background:var(--ok)}
+.inkit input:checked::after{transform:translateX(12px)}
+.later-note{margin:0 0 14px;padding:12px 14px;border:1px dashed var(--line);border-radius:8px;font-size:14px;max-width:72ch}
+
+/* Colour check */
+.looks{display:grid;gap:12px;margin:4px 0 16px}
+.look{display:grid;gap:5px}
+.look-title{font-size:13px;font-weight:600;margin:0}
+.bar{display:flex;gap:2px;height:34px;border-radius:5px;overflow:hidden}
+.bar span{display:block;height:100%;box-shadow:inset 0 0 0 1px var(--swatch-edge)}
+.look-legend{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin:0}
+.slots{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.slots li{display:grid;grid-template-columns:22px 96px minmax(0,1fr);gap:9px;align-items:center;font-size:13.5px;line-height:1.3}
+.slots .sw{width:22px;height:22px;border-radius:4px}
+.slots .sl{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.slots .cn small{color:var(--muted)}
+.slots li.off .cn{color:var(--muted)}
+.slots li.off .cn b{text-decoration:line-through}
+.slots b{font-weight:600}
+.approx{margin:12px 0 0;font-size:12.5px;color:var(--muted)}
+
+/* Orders */
+.orders{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.orders li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.orders li:last-child{border-bottom:0;padding-bottom:0}
+.on{font-weight:600}
+.os{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:500}
+.oi,.od{grid-column:1/-1;font-size:12.5px}
+.oi{color:var(--muted)}
+.od.free{color:var(--ok)}
+.od.paid{color:var(--warn)}
+.empty{color:var(--muted);font-size:14px;margin:0}
+
+/* What to wear */
+.wear{padding-block:28px 8px}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+tbody tr:last-child td{border-bottom:0}
+th{font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td:first-child{font-weight:600;width:22%}
+td:first-child span{display:block;font-family:var(--font-mono);font-size:12.5px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.tip{margin:12px 0 0;max-width:72ch}
+@media (max-width:640px){
+  table,tbody,tr,td{display:block;width:auto}
+  thead{display:none}
+  tr{padding:12px 14px;border-bottom:1px solid var(--line)}
+  tbody tr:last-child{border-bottom:0}
+  td{border:0;padding:3px 0}
+  td:first-child{width:auto}
+  td[data-h]::before{content:attr(data-h);display:block;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+}
+.foot{padding-block:20px 36px;font-size:13px;color:var(--muted)}
+.foot p{margin:0;max-width:80ch}
+
+:focus-visible{outline:2px solid var(--gorse);outline-offset:2px}
+@media (prefers-reduced-motion: no-preference){
+  .inkit input,.inkit input::after,.chip{transition:background-color .15s, border-color .15s, transform .15s}
+}
+</style>
+
+<header class="top">
+  <canvas id="contours" aria-hidden="true"></canvas>
+  <div class="wrap top-inner">
+    <div>
+      <p class="eyebrow">Kit list · Mourne day hikes &amp; night shoots</p>
+      <h1>Hill &amp; Night Kit</h1>
+      <p class="lede">Built from your list for wet Northern Irish hills and long, cold stops with the camera. Pick colours and switch items in or out; the total, colour check and order list update as you go. Prices checked 21 Oct 2026.</p>
+    </div>
+    <section class="budget" aria-labelledby="budget-h">
+      <h2 id="budget-h" class="eyebrow">In basket</h2>
+      <p class="total" id="total">£0.00</p>
+      <div class="meter" aria-hidden="true">
+        <div class="track"><div class="fill" id="m-fill"></div><div class="over" id="m-over"></div></div>
+        <div class="mark" id="m-mark"></div>
+        <div class="mark-label" id="m-label">£800 budget</div>
+      </div>
+      <p class="status" id="status" aria-live="polite"></p>
+      <p class="sub-stats" id="substats"></p>
+      <button class="btn" id="reset" type="button">Reset to recommended</button>
+    </section>
+  </div>
+</header>
+
+<div class="wrap grid">
+  <main>
+    <section id="changes" class="panel changes" aria-labelledby="changes-h">
+      <h2 class="sec" id="changes-h">What changed from your list</h2>
+      <ul>
+        <li><span class="tagc">Swap</span><p><b>Better Sweater → Rab Nexus Hoody.</b> The Better Sweater is a 638 g sweater-knit. It's slow to dry, sweaty on climbs and pills under pack straps. The Nexus weighs 308 g, breathes and stretches, and costs £65–80 less. The Better Sweater is under Later if you still want it for the pub.</p></li>
+        <li><span class="tagc">Swap</span><p><b>Torque Pants → Torque Mountain Pants.</b> Regular fit, a part-elasticated waist and a boot gusset at the hem. The plain Torque is a slim climbing cut.</p></li>
+        <li><span class="tagc">Cheaper</span><p><b>Base layer:</b> the same Icebreaker top is £67.95 at Cotswold, against £89.99 direct.</p></li>
+        <li><span class="tagc">Cheaper</span><p><b>Shell:</b> the same Torrentshell is £144 at The Mountain Factor. Your Smolder Blue is £180 at Patagonia unless Mountain Factor has it in L.</p></li>
+        <li><span class="tagc">Added</span><p><b>Talini</b> for stops and night shoots, <b>Downpour overtrousers</b> for proper rain, a <b>waterproof cap</b> for your glasses and a <b>merino beanie</b>.</p></li>
+        <li><span class="tagc">Skip</span><p><b>Lower base layer and tee.</b> Leggings would overheat you on the move, so they're under Later for winter night shoots. A tee can wait for spring; the long-sleeve covers October to April.</p></li>
+      </ul>
+    </section>
+
+    <section id="kit" aria-labelledby="kit-h">
+      <h2 class="sec" id="kit-h">The kit</h2>
+      <p class="sec-sub">Ten pieces on top of your gloves, daypack and headtorch. Sizes assume L tops, a 34–36″ waist and UK 10 feet.</p>
+      <div id="kit-groups"></div>
+    </section>
+
+    <section id="later" aria-labelledby="later-h">
+      <h2 class="sec" id="later-h">Later</h2>
+      <p class="sec-sub">Outside the £800. Switch any of these on to see the new total.</p>
+      <p class="later-note"><b>Summer tee:</b> leave it until spring. Then get a plain 150-weight merino tee in charcoal or olive for warm days.</p>
+      <div id="later-groups"></div>
+    </section>
+  </main>
+
+  <aside>
+    <section id="check" class="panel" aria-labelledby="check-h">
+      <h2 class="sec" id="check-h">Colour check</h2>
+      <div class="looks" id="looks"></div>
+      <ul class="slots" id="slots"></ul>
+      <p class="approx">Swatches are approximate. Check the product photos before you order.</p>
+    </section>
+    <section id="orders-sec" class="panel" aria-labelledby="orders-h">
+      <h2 class="sec" id="orders-h">Orders by store</h2>
+      <p class="sec-sub" style="margin-bottom:12px">What's in the basket, grouped by where to buy it.</p>
+      <ol class="orders" id="orders"></ol>
+    </section>
+  </aside>
+</div>
+
+<section class="wrap wear" aria-labelledby="wear-h">
+  <h2 class="sec" id="wear-h">What to wear when</h2>
+  <p class="sec-sub">How the pieces combine across a typical year in the Mournes.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th scope="col">Conditions</th><th scope="col">Wear</th><th scope="col">Carry</th></tr></thead>
+      <tbody>
+        <tr><td>Mild and dry<span>10–18 °C</span></td><td data-h="Wear">Base layer with sleeves pushed up, Torques, cap</td><td data-h="Carry">Nexus, shell, Downpours</td></tr>
+        <tr><td>Wet and windy<span>4–12 °C · most hill days</span></td><td data-h="Wear">Base, Torques, shell with the cap under the hood. Downpours on once the rain settles in.</td><td data-h="Carry">Nexus for the summit, Talini for lunch</td></tr>
+        <tr><td>Cold and clear<span>−2–5 °C</span></td><td data-h="Wear">Base and Nexus, Torques, beanie, gloves. Shell on when the wind picks up.</td><td data-h="Carry">Talini for every stop, Downpours</td></tr>
+        <tr><td>Night shoot<span>standing 1–3 h</span></td><td data-h="Wear">Base, Nexus and Talini with the shell over the top. Downpours over the Torques to cut the wind. Beanie and gloves.</td><td data-h="Carry">Flexi Chute and leggings in winter, a foam sit pad, a flask</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="tip">Put the Talini on as soon as you stop, before you start to cool. Its synthetic fill copes with damp, so it works under or over the shell.</p>
+</section>
+
+<footer class="wrap foot">
+  <p>Prices and stock as of 21 Oct 2026. Cotswold's boots, socks and Downpours and The Mountain Factor's Torrentshell are sale prices and may change. Your choices are saved in this browser only.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var BUDGET_P = 80000;
+  var KEY = "hill-night-kit-v1";
+
+  var STORES = {
+    cotswold:{name:"Cotswold Outdoor", free:125, note:"Try on and click & collect in Belfast (Castle Lane or Boucher Retail Park). Free returns to store."},
+    mf:{name:"The Mountain Factor", free:50, note:""},
+    alpkit:{name:"Alpkit", free:60, note:""},
+    hardloop:{name:"Hardloop", free:150, note:""},
+    go:{name:"GO Outdoors", free:80, note:"£3.99 standard delivery below £80. No next-day delivery to BT postcodes."},
+    sealskinz:{name:"Sealskinz", free:50, note:""},
+    smartwool:{name:"Smartwool", free:55, note:""},
+    icebreaker:{name:"Icebreaker", free:40, note:""},
+    patagonia:{name:"Patagonia", free:null, note:""}
+  };
+
+  var U = {
+    base:"https://www.cotswoldoutdoor.com/p/icebreaker-mens-200-oasis-base-layer-top-A1924088.html",
+    nexusHL:"https://www.hardloop.co.uk/product/54410-rab-nexus-hoody-fleece-jacket-mens",
+    nexusCO:"https://www.cotswoldoutdoor.com/p/rab-mens-nexus-hoody-B12BEA0054.html",
+    talini:"https://alpkit.com/products/talini-mens",
+    tsMF:"https://www.themountainfactor.com/product/men/jackets-men/waterproof-jackets-men/patagonia-m-torrentshell-3l-rain-jkt/",
+    tsPat:"https://eu.patagonia.com/gb/en/product/mens-torrentshell-3-layer-rain-jacket/85241.html?dwvar_85241_color=SMDB",
+    torque:"https://www.cotswoldoutdoor.com/p/rab-mens-torque-mountain-pant-B12CEK0055.html",
+    downpour:"https://www.cotswoldoutdoor.com/p/rab-mens-downpour-waterproof-pants-B12CEH0679.html",
+    socksCO:"https://www.cotswoldoutdoor.com/p/smartwool-mens-hike-full-cushion-crew-socks-B5114957.html",
+    socksSW:"https://eu.smartwool.com/en-gb/products/hike-crew-socks-sw001618001",
+    terra:"https://www.cotswoldoutdoor.com/p/scarpa-mens-terra-gtx-boots-B1124125.html",
+    capGO:"https://www.gooutdoors.co.uk/products/sealskinz-langham-cap-black-715800",
+    capSZ:"https://www.sealskinz.com/products/waterproof-all-weather-cap",
+    beanie:"https://eu.smartwool.com/en-gb/products/merino-beanie-sw017047001",
+    leggings:"https://eu.icebreaker.com/en-gb/products/merino-200-oasis-thermal-leggings-ib104369401",
+    chute:"https://eu.icebreaker.com/en-gb/products/merino-200-flexi-chute-ib100962001",
+    poles:"https://alpkit.com/products/alpine-trail-twins",
+    better:"https://eu.patagonia.com/gb/en/product/mens-better-sweater-fleece-jacket/191743869006.html"
+  };
+
+  var N_MF = "20% off. Stock varies by colour and size, so confirm L at checkout.";
+  var N_COT_SOCKS = "20% off walking socks at Cotswold this month.";
+
+  var GROUPS = [
+    {k:"upper", title:"Upper body", sub:"base to shell, in wearing order", target:"kit-groups"},
+    {k:"legs", title:"Legs", sub:"", target:"kit-groups"},
+    {k:"feet", title:"Feet", sub:"", target:"kit-groups"},
+    {k:"head", title:"Head", sub:"your navy gloves cover hands", target:"kit-groups"},
+    {k:"later", title:"When the season or budget allows", sub:"", target:"later-groups"}
+  ];
+
+  var ITEMS = [
+    {id:"base", group:"upper", short:"200 Oasis base layer", layer:"Base layer",
+     name:"Icebreaker 200 Oasis Long Sleeve Crew",
+     why:"Merino next to the skin. Warm when damp and still fresh after a long day.",
+     spec:"100% merino · 200 g/m² · 18.9 µm · slim fit · 217 g",
+     size:"L. It's a slim fit, so XL if you want more room at the waist.",
+     note:"Same top as your bookmark, £22 less than Icebreaker's £89.99.",
+     inn:true, def:0, colours:[
+       {n:"Black", hex:"#1c1d1f", p:67.95, s:"cotswold", u:U.base},
+       {n:"Midnight Navy", hex:"#252e44", p:67.95, s:"cotswold", u:U.base},
+       {n:"Gritstone Heather", hex:"#6c6d69", p:67.95, s:"cotswold", u:U.base}
+     ]},
+    {id:"mid", group:"upper", short:"Nexus Hoody", layer:"Mid layer",
+     name:"Rab Nexus Hoody",
+     why:"Grid fleece that breathes on climbs and dries fast. The hood sits under the shell hood.",
+     spec:"Thermic G grid fleece · 94% recycled polyester, 6% elastane · 308 g",
+     size:"L",
+     note:"Replaces the Better Sweater (see What changed).",
+     inn:true, def:0, colours:[
+       {n:"Black", hex:"#1f2022", p:60.10, s:"hardloop", u:U.nexusHL, note:"25% off at Hardloop, which charges delivery under £150."},
+       {n:"Tempest Blue", hex:"#2e3c52", p:75.00, s:"cotswold", u:U.nexusCO, note:"Joins the Cotswold order (free delivery, try it on in Belfast) and ties in with your navy gloves."}
+     ]},
+    {id:"ins", group:"upper", short:"Talini", layer:"Insulation",
+     name:"Alpkit Talini",
+     why:"Synthetic fill that keeps about 90% of its warmth when wet. On at every stop and for the whole of a night shoot.",
+     spec:"PrimaLoft Silver ThermoPlume · 190 g fill · warmth ≈ 600-fill down · 390 g · no hood",
+     size:"L (made for a 109 cm chest)",
+     note:"Some sizes are pre-order, so check the despatch date. For a hood, the Rab Cirrus Alpine is £171 at Cotswold.",
+     inn:true, def:0, colours:[
+       {n:"Tarmac", hex:"#34383c", p:99.99, s:"alpkit", u:U.talini},
+       {n:"Chilli", hex:"#8c2f27", p:99.99, s:"alpkit", u:U.talini}
+     ]},
+    {id:"shell", group:"upper", short:"Torrentshell 3L", layer:"Shell",
+     name:"Patagonia Torrentshell 3L",
+     why:"Three-layer waterproof with pit zips and a stiff peaked hood that keeps rain off your glasses.",
+     spec:"H2No 3-layer · recycled nylon ripstop · PFAS-free DWR · pit zips · ≈400 g",
+     size:"L. If you'll wear the Talini under it on night shoots, try XL.",
+     note:"",
+     inn:true, def:0, colours:[
+       {n:"Noble Grey", hex:"#5a5e61", p:144.00, s:"mf", u:U.tsMF, note:N_MF},
+       {n:"Smolder Blue", hex:"#4e6273", p:180.00, s:"patagonia", u:U.tsPat, note:"Your bookmark. The Mountain Factor lists it too, so check there for an L at £144 first."},
+       {n:"Caper Green", hex:"#7d8369", p:144.00, s:"mf", u:U.tsMF, note:N_MF},
+       {n:"Marlow Brown", hex:"#6b4f3e", p:144.00, s:"mf", u:U.tsMF, note:N_MF}
+     ]},
+    {id:"trousers", group:"legs", short:"Torque Mountain Pants", layer:"Trousers",
+     name:"Rab Torque Mountain Pants",
+     why:"Stretchy softshell that shrugs off showers and dries fast. Regular fit with a part-elasticated waist.",
+     spec:"Matrix double-weave · 88% nylon, 12% elastane · PFAS-free DWR · boot gusset at the hem",
+     size:"Waist L = 34″, XL = 36″ · Regular leg",
+     note:"£110 everywhere this week (Rab, Cotswold, Snow+Rock).",
+     inn:true, def:0, colours:[
+       {n:"Black", hex:"#1d1e20", p:110.00, s:"cotswold", u:U.torque},
+       {n:"Anthracite/Black", hex:"#3c3f43", p:110.00, s:"cotswold", u:U.torque}
+     ]},
+    {id:"over", group:"legs", short:"Downpour overtrousers", layer:"Overtrousers",
+     name:"Rab Downpour Waterproof Pants",
+     why:"For proper rain and wind. The three-quarter side zips pull on over boots.",
+     spec:"Pertex Shield 2.5L · 20,000 mm hydrostatic head · PFC-free DWR · 263 g",
+     size:"Match the Torques (L = 86 cm waist)",
+     note:"15% off (RRP £90).",
+     inn:true, def:0, colours:[
+       {n:"Black", hex:"#1b1c1e", p:76.45, s:"cotswold", u:U.downpour}
+     ]},
+    {id:"socks", group:"feet", short:"Hike socks", layer:"Socks",
+     name:"Smartwool Hike Full Cushion Crew",
+     why:"Full cushioning for leather boots. Merino stays warm when wet.",
+     spec:"64% merino · 34% recycled nylon · 2% elastane",
+     size:"L (Smartwool's L covers UK 8–10.5)",
+     note:"",
+     inn:true, def:0, colours:[
+       {n:"Black", hex:"#1e1e20", p:20.76, s:"cotswold", u:U.socksCO, note:N_COT_SOCKS},
+       {n:"Light Gray", hex:"#b5b7b8", p:25.99, s:"smartwool", u:U.socksSW, note:"From Smartwool direct. Cotswold only has Black."},
+       {n:"Chestnut", hex:"#7b4a32", p:25.99, s:"smartwool", u:U.socksSW, note:"From Smartwool direct. Cotswold only has Black."}
+     ]},
+    {id:"boots", group:"feet", short:"Terra GTX", layer:"Boots",
+     name:"Scarpa Terra GTX",
+     why:"Leather and Gore-Tex on a Vibram sole, with enough stiffness for rocky Mourne descents.",
+     spec:"2 mm leather · Gore-Tex lining · Vibram sole · 1230 g/pair",
+     size:"UK 10 isn't listed online. Try 10 and 10.5 in Cotswold Belfast wearing the hike socks.",
+     note:"20% off (RRP £209.95). Belfast stores: Castle Lane BT1 5DA and Boucher Retail Park BT12 6HU.",
+     inn:true, def:0, colours:[
+       {n:"Brown", hex:"#6b4b31", p:167.96, s:"cotswold", u:U.terra}
+     ]},
+    {id:"cap", group:"head", short:"Langham cap", layer:"Rain cap",
+     name:"Sealskinz Langham Cap",
+     why:"Waterproof peaked cap. Under the shell hood, the brim keeps rain off your glasses.",
+     spec:"Aquasealz 3-layer membrane · SPF 40+ · buckle-adjust, one size up to 58 cm",
+     size:"One size. Cinch the buckle for a smaller head.",
+     note:"",
+     inn:true, def:0, colours:[
+       {n:"Black", hex:"#1d1e20", p:25.00, s:"go", u:U.capGO, note:"GO Outdoors adds £3.99 delivery under £80."},
+       {n:"Navy", hex:"#222c45", p:30.00, s:"sealskinz", u:U.capSZ, note:"Sealskinz direct. Matches your navy gloves."},
+       {n:"Grey", hex:"#6f7275", p:30.00, s:"sealskinz", u:U.capSZ, note:"Sealskinz direct."}
+     ]},
+    {id:"beanie", group:"head", short:"Merino beanie", layer:"Beanie",
+     name:"Smartwool Merino Beanie",
+     why:"Thin enough to wear under the hood. Merino stays warm when damp.",
+     spec:"88% merino, 12% nylon · one size, 55–60 cm, very stretchy",
+     size:"One size. The stretch holds on a smaller head.",
+     note:"Stock looks low on Smartwool's site. If it's gone, Icebreaker's 200 Oasis Reversible Beanie (£32.99) is the closest swap.",
+     inn:true, def:0, colours:[
+       {n:"Black", hex:"#1c1c1e", p:26.99, s:"smartwool", u:U.beanie},
+       {n:"Light Gray Heather", hex:"#a7a8a6", p:26.99, s:"smartwool", u:U.beanie}
+     ]},
+    {id:"socks2", group:"later", short:"Spare hike socks", layer:"Spare socks",
+     name:"Second pair of hike socks",
+     why:"Rotate pairs so one is always dry, and change into the fresh pair before a long night shoot.",
+     spec:"Smartwool Hike Full Cushion Crew · 64% merino",
+     size:"L",
+     note:"",
+     inn:false, def:0, colours:[
+       {n:"Black", hex:"#1e1e20", p:20.76, s:"cotswold", u:U.socksCO, note:N_COT_SOCKS}
+     ]},
+    {id:"leggings", group:"later", short:"200 Oasis leggings", layer:"Lower base layer",
+     name:"Icebreaker 200 Oasis Thermal Leggings",
+     why:"For winter night shoots only. On the move they'd overheat you.",
+     spec:"100% merino (excluding waistband) · 200 g/m² · slim fit",
+     size:"L",
+     note:"Cheaper option: Icebreaker 175 Everyday Thermal Leggings, £69.99.",
+     inn:false, def:0, colours:[
+       {n:"Midnight Navy", hex:"#252e44", p:89.99, s:"icebreaker", u:U.leggings, note:"Black, Gritstone Heather and Dk Loden are on the same page. Nobody sees this layer."}
+     ]},
+    {id:"gaiter", group:"later", short:"Flexi Chute", layer:"Neck",
+     name:"Icebreaker 200 Oasis Flexi Chute",
+     why:"Merino neck tube for windy summits and night shoots. Pulls up over the ears or works as a hat liner.",
+     spec:"100% merino · 200 g/m²",
+     size:"One size",
+     note:"",
+     inn:false, def:0, colours:[
+       {n:"Black", hex:"#1c1c1e", p:26.99, s:"icebreaker", u:U.chute}
+     ]},
+    {id:"poles", group:"later", short:"Alpine Trail poles", layer:"Trekking poles",
+     name:"Alpkit Alpine Trail Twins",
+     why:"Saves your knees on steep Mourne descents and steadies you through bog.",
+     spec:"Pair · snap-lock adjustment · anti-shock",
+     size:"Adjustable",
+     note:"Lighter carbon option: Alpkit Carbonlong Backpacker Twins, £69.99.",
+     inn:false, def:0, colours:[
+       {n:"", hex:null, p:36.99, s:"alpkit", u:U.poles}
+     ]},
+    {id:"cream", group:"later", short:"HS12 boot cream", layer:"Boot care",
+     name:"Scarpa HS12 Footwear Cream",
+     why:"Keeps the Terra leather supple and shedding water. Rub it in after muddy days.",
+     spec:"Leather care cream",
+     size:"One tub",
+     note:"",
+     inn:false, def:0, colours:[
+       {n:"", hex:null, p:14.50, s:"cotswold", u:U.terra, note:"Offered as an add-on on the Terra GTX page."}
+     ]},
+    {id:"better", group:"later", short:"Better Sweater", layer:"Alternative mid layer", alt:true,
+     name:"Patagonia Better Sweater",
+     why:"Your original pick. Great for the pub and travel days, but heavy and slow to dry on the hill.",
+     spec:"Recycled polyester sweater-knit fleece · 638 g",
+     size:"L. It runs slightly small, so XL if you'll layer under it.",
+     note:"Not counted in the Later total.",
+     inn:false, def:0, colours:[
+       {n:"Stonewash", hex:"#8e8a7e", p:140.00, s:"patagonia", u:U.better, note:"Pick the colour on Patagonia's page."},
+       {n:"Old Growth Green", hex:"#4b5641", p:140.00, s:"patagonia", u:U.better, note:"Pick the colour on Patagonia's page."},
+       {n:"New Navy", hex:"#263049", p:140.00, s:"patagonia", u:U.better, note:"Pick the colour on Patagonia's page."},
+       {n:"Black", hex:"#1c1c1e", p:140.00, s:"patagonia", u:U.better, note:"Pick the colour on Patagonia's page."}
+     ]}
+  ];
+
+  var SLOTS = [
+    {k:"cap", label:"Cap", from:["cap"]},
+    {k:"beanie", label:"Beanie", from:["beanie"]},
+    {k:"shell", label:"Shell", from:["shell"]},
+    {k:"ins", label:"Insulation", from:["ins"]},
+    {k:"mid", label:"Mid layer", from:["mid","better"]},
+    {k:"base", label:"Base layer", from:["base"]},
+    {k:"gloves", label:"Gloves", owned:{n:"Navy / washed blue", hex:"#3d5577"}},
+    {k:"trousers", label:"Trousers", from:["trousers"]},
+    {k:"over", label:"Overtrousers", from:["over"]},
+    {k:"socks", label:"Socks", from:["socks"]},
+    {k:"boots", label:"Boots", from:["boots"]}
+  ];
+
+  var LOOKS = [
+    {title:"Moving in the rain", parts:[["cap",10],["shell",38],["gloves",7],["over",32],["boots",13]]},
+    {title:"Dry, shell off", parts:[["cap",10],["mid",40],["trousers",37],["boots",13]]},
+    {title:"Stopped in the cold", parts:[["beanie",10],["ins",38],["gloves",7],["trousers",32],["boots",13]]}
+  ];
+
+  var BY_ID = {};
+  ITEMS.forEach(function(it){ BY_ID[it.id] = it; });
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function pence(n){ return Math.round(n * 100); }
+  function gbpP(p){
+    var neg = p < 0; p = Math.abs(p);
+    var s = "£" + Math.floor(p / 100).toLocaleString("en-GB") + "." + String(p % 100).padStart(2, "0");
+    return neg ? "−" + s : s;
+  }
+
+  function defaults(){
+    var s = {};
+    ITEMS.forEach(function(it){ s[it.id] = {on: !!it.inn, c: it.def || 0}; });
+    return s;
+  }
+  var state = defaults();
+
+  function load(){
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      ITEMS.forEach(function(it){
+        var v = o && o[it.id];
+        if (!v || typeof v !== "object") return;
+        if (typeof v.on === "boolean") state[it.id].on = v.on;
+        if (Number.isInteger(v.c) && v.c >= 0 && v.c < it.colours.length) state[it.id].c = v.c;
+      });
+    } catch (e) {}
+  }
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function cur(it){ return it.colours[state[it.id].c]; }
+
+  function cardHTML(it){
+    var hasColour = it.colours.some(function(c){ return !!c.hex; });
+    var chips = "";
+    if (hasColour) {
+      chips = '<div class="chips" role="group" aria-label="Colour for ' + esc(it.short) + '">' +
+        it.colours.map(function(c, i){
+          return '<button type="button" class="chip" data-i="' + i + '" aria-pressed="false">' +
+            '<span class="sw" style="--c:' + c.hex + '"></span>' + esc(c.n) +
+            (i === it.def && it.colours.length > 1 ? '<span class="pick">pick</span>' : '') +
+            '</button>';
+        }).join("") + '</div>';
+    }
+    return '<article class="item" id="item-' + it.id + '">' +
+      '<div class="item-head"><span class="layer">' + esc(it.layer) + '</span>' +
+      '<label class="inkit" for="in-' + it.id + '"><input type="checkbox" id="in-' + it.id + '"><span class="inlbl">In basket</span></label></div>' +
+      '<h4>' + esc(it.name) + '</h4>' +
+      '<p class="why">' + esc(it.why) + '</p>' +
+      '<p class="spec">' + esc(it.spec) + '</p>' +
+      chips +
+      '<dl class="meta"><div><dt>Order</dt><dd>' + esc(it.size) + '</dd></div>' +
+      (it.note ? '<div><dt>Note</dt><dd>' + esc(it.note) + '</dd></div>' : '') +
+      '<div class="cnote-row"><dt>Shop</dt><dd class="cnote"></dd></div></dl>' +
+      '<div class="buy"><div><span class="amt"></span> <span class="store"></span></div>' +
+      '<a class="go" target="_blank" rel="noopener">View item ↗</a></div>' +
+      '</article>';
+  }
+
+  function build(){
+    GROUPS.forEach(function(g){
+      var items = ITEMS.filter(function(it){ return it.group === g.k; });
+      if (!items.length) return;
+      var host = document.getElementById(g.target);
+      var wrap = document.createElement("div");
+      wrap.className = "group";
+      wrap.innerHTML = '<h3 class="grp">' + esc(g.title) + (g.sub ? ' <small>' + esc(g.sub) + '</small>' : '') + '</h3>' +
+        '<div class="cards">' + items.map(cardHTML).join("") + '</div>';
+      host.appendChild(wrap);
+    });
+  }
+
+  function slotInfo(k){
+    var s = SLOTS.filter(function(x){ return x.k === k; })[0];
+    if (s.owned) return {hex:s.owned.hex, n:s.owned.n, item:"yours", on:true};
+    var it = null;
+    for (var i = 0; i < s.from.length; i++) { if (state[s.from[i]].on) { it = BY_ID[s.from[i]]; break; } }
+    if (!it) it = BY_ID[s.from[0]];
+    var c = cur(it);
+    return {hex:c.hex, n:c.n, item:it.short, on:state[it.id].on};
+  }
+
+  function renderItems(){
+    ITEMS.forEach(function(it){
+      var st = state[it.id], c = cur(it);
+      var card = document.getElementById("item-" + it.id);
+      card.classList.toggle("out", !st.on);
+      var inp = card.querySelector(".inkit input");
+      inp.checked = st.on;
+      card.querySelector(".inlbl").textContent = st.on ? "In basket" : "Not in basket";
+      Array.prototype.forEach.call(card.querySelectorAll(".chip"), function(b, i){
+        b.setAttribute("aria-pressed", i === st.c ? "true" : "false");
+      });
+      card.querySelector(".amt").textContent = gbpP(pence(c.p));
+      card.querySelector(".store").textContent = STORES[c.s].name;
+      var a = card.querySelector(".go");
+      a.href = c.u;
+      a.setAttribute("aria-label", "View " + it.name + (c.n ? " in " + c.n : "") + " at " + STORES[c.s].name);
+      var row = card.querySelector(".cnote-row");
+      row.hidden = !c.note;
+      card.querySelector(".cnote").textContent = c.note || "";
+    });
+  }
+
+  function renderTotals(){
+    var inP = 0, laterP = 0, nIn = 0, stores = {};
+    ITEMS.forEach(function(it){
+      var st = state[it.id], p = pence(cur(it).p);
+      if (st.on) { inP += p; nIn++; stores[cur(it).s] = true; }
+      else if (!it.alt) laterP += p;
+    });
+    document.getElementById("total").textContent = gbpP(inP);
+    var scale = Math.max(inP, BUDGET_P) * 1.04;
+    var markPct = BUDGET_P / scale * 100;
+    document.getElementById("m-fill").style.width = (Math.min(inP, BUDGET_P) / scale * 100) + "%";
+    var over = document.getElementById("m-over");
+    over.style.left = markPct + "%";
+    over.style.width = (Math.max(inP - BUDGET_P, 0) / scale * 100) + "%";
+    document.getElementById("m-mark").style.left = markPct + "%";
+    var lab = document.getElementById("m-label");
+    lab.style.left = Math.min(Math.max(markPct, 12), 88) + "%";
+    var status = document.getElementById("status");
+    var diff = BUDGET_P - inP;
+    if (diff > 0) { status.textContent = gbpP(diff) + " under your £800"; status.className = "status ok"; }
+    else if (diff < 0) { status.textContent = gbpP(-diff) + " over your £800"; status.className = "status over"; }
+    else { status.textContent = "Exactly £800"; status.className = "status ok"; }
+    var nStores = Object.keys(stores).length;
+    document.getElementById("substats").textContent =
+      nIn + (nIn === 1 ? " item" : " items") + " from " + nStores + (nStores === 1 ? " store" : " stores") +
+      " · Later list " + gbpP(laterP);
+  }
+
+  function renderCheck(){
+    document.getElementById("looks").innerHTML = LOOKS.map(function(L){
+      var segs = L.parts.map(function(pt){
+        var si = slotInfo(pt[0]);
+        var label = SLOTS.filter(function(x){ return x.k === pt[0]; })[0].label;
+        return '<span style="flex:' + pt[1] + ' 1 0;background:' + si.hex + '" title="' + esc(label + ": " + si.n) + '"></span>';
+      }).join("");
+      var legend = L.parts.map(function(pt){
+        return SLOTS.filter(function(x){ return x.k === pt[0]; })[0].label;
+      }).join(" · ");
+      return '<div class="look"><p class="look-title">' + esc(L.title) + '</p>' +
+        '<div class="bar" role="img" aria-label="' + esc(L.title + ": " + L.parts.map(function(pt){ var si = slotInfo(pt[0]); return SLOTS.filter(function(x){ return x.k === pt[0]; })[0].label + " " + si.n; }).join(", ")) + '">' + segs + '</div>' +
+        '<p class="look-legend">' + esc(legend) + '</p></div>';
+    }).join("");
+    document.getElementById("slots").innerHTML = SLOTS.map(function(s){
+      var si = slotInfo(s.k);
+      return '<li class="' + (si.on ? "" : "off") + '"><span class="sw" style="--c:' + si.hex + '"></span>' +
+        '<span class="sl">' + esc(s.label) + '</span>' +
+        '<span class="cn"><b>' + esc(si.n) + '</b> <small>' + esc(si.on ? si.item : si.item + ", not in basket") + '</small></span></li>';
+    }).join("");
+  }
+
+  function renderOrders(){
+    var groups = {}, order = [];
+    ITEMS.forEach(function(it){
+      if (!state[it.id].on) return;
+      var c = cur(it);
+      if (!groups[c.s]) { groups[c.s] = {items:[], p:0}; order.push(c.s); }
+      groups[c.s].items.push(it.short);
+      groups[c.s].p += pence(c.p);
+    });
+    order.sort(function(a, b){ return groups[b].p - groups[a].p; });
+    var host = document.getElementById("orders");
+    if (!order.length) { host.innerHTML = '<li><p class="empty">Nothing in the basket yet. Switch an item on to start an order.</p></li>'; return; }
+    host.innerHTML = order.map(function(k){
+      var g = groups[k], S = STORES[k], d;
+      if (S.free === null) d = '<span class="od">Delivery shown at checkout</span>';
+      else if (g.p >= S.free * 100) d = '<span class="od free">Free delivery (over £' + S.free + ')</span>';
+      else d = '<span class="od paid">Delivery charged (free over £' + S.free + ')</span>';
+      return '<li><span class="on">' + esc(S.name) + '</span><span class="os">' + gbpP(g.p) + '</span>' +
+        '<span class="oi">' + esc(g.items.join(", ")) + '</span>' + d +
+        (S.note ? '<span class="oi">' + esc(S.note) + '</span>' : '') + '</li>';
+    }).join("");
+  }
+
+  function render(){
+    renderItems();
+    renderTotals();
+    renderCheck();
+    renderOrders();
+  }
+
+  /* Contour sketch: closed rings around a summit, every fifth ring heavier like an index contour. */
+  function drawContours(){
+    var cv = document.getElementById("contours");
+    if (!cv || !cv.getContext) return;
+    var r = cv.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, r.width, r.height);
+    var css = getComputedStyle(document.documentElement);
+    var line = css.getPropertyValue("--contour").trim() || "#c6cfcb";
+    var mark = css.getPropertyValue("--gorse-ink").trim() || "#7a5a08";
+    var narrow = r.width < 700;
+    var cx = r.width * (narrow ? 0.86 : 0.62), cy = r.height * (narrow ? 0.18 : 0.46);
+    var step = narrow ? 22 : 26;
+    ctx.strokeStyle = line;
+    for (var k = 1; k <= 18; k++) {
+      ctx.beginPath();
+      for (var j = 0; j <= 160; j++) {
+        var t = j / 160 * Math.PI * 2;
+        var rad = k * step * (1 + 0.16 * Math.sin(3 * t + k * 0.35) + 0.08 * Math.sin(5 * t - k * 0.5) + 0.05 * Math.cos(2 * t + k));
+        var x = cx + rad * Math.cos(t) * 1.4, y = cy + rad * Math.sin(t) * 0.82;
+        if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.lineWidth = (k % 5 === 0) ? 1.6 : 0.9;
+      ctx.stroke();
+    }
+    if (!narrow) {
+      ctx.fillStyle = mark;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 5); ctx.lineTo(cx + 5, cy + 4); ctx.lineTo(cx - 5, cy + 4); ctx.closePath();
+      ctx.fill();
+      ctx.font = '500 11px "IBM Plex Mono", ui-monospace, Menlo, monospace';
+      ctx.fillText("850", cx + 9, cy + 4);
+    }
+  }
+  var raf = 0;
+  function queueDraw(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(drawContours); }
+
+  build();
+  load();
+  render();
+  queueDraw();
+
+  document.addEventListener("click", function(e){
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    var card = b.closest(".item");
+    var id = card.id.slice(5);
+    state[id].c = parseInt(b.getAttribute("data-i"), 10);
+    save(); render();
+  });
+  document.addEventListener("change", function(e){
+    var inp = e.target.closest(".inkit input");
+    if (!inp) return;
+    var id = inp.id.slice(3);
+    state[id].on = inp.checked;
+    save(); render();
+  });
+  document.getElementById("reset").addEventListener("click", function(){
+    state = defaults(); save(); render();
+  });
+
+  window.addEventListener("resize", queueDraw);
+  if (window.ResizeObserver) new ResizeObserver(queueDraw).observe(document.querySelector(".top"));
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", queueDraw); } catch (e) {}
+  new MutationObserver(queueDraw).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(queueDraw);
+})();
+</script>
+
+</body></html>
